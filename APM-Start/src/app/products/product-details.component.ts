@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { IProduct } from './product-list.component';
 import { Location } from '@angular/common';
+import { filter } from 'rxjs/operators';
+import { ProductService } from '../home/productService/Product.service';
 @Component({
   selector: 'pm-product-details',
   templateUrl: './product-details.component.html',
@@ -9,26 +11,20 @@ import { Location } from '@angular/common';
 })
 export class ProductDetailsComponent implements OnInit {
   pageTitle: string = 'Product Detail';
-  product: IProduct =   {
-    "productId": 1,
-    "productName": "Leaf Rake",
-    "productCode": "GDN-0011",
-    "releaseDate": "March 19, 2016",
-    "description": "Leaf rake with 48-inch wooden handle.",
-    "price": 19.95,
-    "starRating": 3.2,
-    "imageUrl": "https://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png"
-  };
+  product: IProduct;
   constructor(private route: ActivatedRoute,
-    private location: Location
-    ) { }
+    private location: Location, private productService: ProductService
+  ) { }
 
-ngOnInit() {
-  let id = +this.route.snapshot.paramMap.get('id');
-}
+  ngOnInit() {
+    let id = +this.route.snapshot.paramMap.get('id');
+    this.productService.getProducts().subscribe(products=>{
+      this.product = products.filter(el=>el.productId === id)[0];
+    })
+  }
 
-onBack(){
-  this.location.back();
-}
+  onBack() {
+    this.location.back(); // or router.navigate to /products
+  }
 
 }
